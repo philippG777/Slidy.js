@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Slidy</title>
+    <style type="text/css">
+        * {
+            box-sizing: border-box;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+        #slideshow {
+            top: 25%;
+            left: 25%;
+            height: 50%;
+            width: 50%;
+        }
+    </style>
+    <script type="text/javascript" src="slidy.js"></script>
+</head>
+<body>
+    <div id="slideshow">
+    </div>
+    <script type="text/javascript">
+        var slideShow = new Slidy("slideshow");
+        slideShow.addSlide("red.html");
+        slideShow.addSlide("green.html");
+        slideShow.addSlide("blue.html");
+        slideShow.setSpeed(2);
+        slideShow.setAnimationSpeed(1);
+        slideShow.start();
+    </script>
+</body>
+</html>
