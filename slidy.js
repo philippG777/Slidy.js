@@ -29,8 +29,9 @@ function Slidy(id)
 
     this.iframes[0].className = "active";
 
-    this.addSlide = function(url, cache = false)
+    this.addSlide = function(url, cache)
     {
+        cache = false || cache;
         if(cache)
         {
             this.slides.push([url, "none"]);   // place for url and html-cache
