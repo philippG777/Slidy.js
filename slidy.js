@@ -2,8 +2,8 @@
  *slidy.js JavaScript Library v1.0
  *Copyright philippG777 2017
  *https://github.com/philippG777/Slidy.js
- *This work is licensed under the BSD 2-Clause License.
- *To view a copy of this license, visit https://opensource.org/licenses/BSD-2-Clause.
+ *self work is licensed under the BSD 2-Clause License.
+ *To view a copy of self license, visit https://opensource.org/licenses/BSD-2-Clause.
  */
 
 /*
@@ -13,129 +13,140 @@ NOTE: caching is currently not implemented
 
 function Slidy(id)
 {
-    this.id = id;
-    this.div = document.getElementById(id);
-    this.iframes = [];
-    this.iframeCount = 0;
-    this.slides = [];
-    this.slideCount = 0;
-    this.speed = 10000;
-    this.animationSpeed = 1;
-    for(var i = 0; i < 2; i++)  // create iframes
+    var self = this;
+    self.id = id;
+    self.div = document.getElementById(id);
+    self.iframes = [];
+    self.iframeCount = 0;
+    self.slides = [];
+    self.slideCount = 0;
+    self.speed = 10000;
+    self.animationSpeed = 1;
+
+    self.running = false;
+
+    for (var i = 0; i < 2; i++)  // create iframes
     {
-        this.iframes[i] = document.createElement("iframe");
-        this.div.appendChild(this.iframes[i]);
+        self.iframes[i] = document.createElement("iframe");
+        self.div.appendChild(self.iframes[i]);
     }
 
-    this.iframes[0].className = "active";
+    self.iframes[0].className = "active";
 
-    this.addSlide = function(url, cache)
+    self.addSlide = function (url)
     {
-        cache = false || cache;
-        if(cache)
-        {
-            this.slides.push([url, "none"]);   // place for url and html-cache
-        }
-        else
-        {
-            this.slides.push([url, ""]);
-        }
+        self.slides.push(url);
     };
 
-    this.setSpeed = function(speed)
+    self.setSpeed = function (speed)
     {
-        this.speed = speed * 1000;
+        self.speed = speed * 1000;
     };
 
-    this.setAnimationSpeed = function(speed)
+    self.setAnimationSpeed = function (speed)
     {
-        this.animationSpeed = speed;
+        self.animationSpeed = speed;
     };
 
-    this.slide = function()
+    self.slide = function ()
     {
-        var len = this.slides.length;
-        if(this.slideCount == len - 1)
+        var len = self.slides.length;
+        if (self.slideCount == len - 1)
         {
-            this.slideCount = 0;
+            self.slideCount = 0;
         }
         else
         {
-            this.slideCount++;
+            self.slideCount++;
         }
 
-        this.inactiveIframe = this.iframes[this.iframeCount];
-        this.iframes[this.iframeCount].className = "afterActive";
+        self.inactiveIframe = self.iframes[self.iframeCount];
+        self.iframes[self.iframeCount].className = "afterActive";
 
-        if(this.iframeCount == 1)
+        if (self.iframeCount == 1)
         {
-            this.iframeCount = 0;
+            self.iframeCount = 0;
         }
         else
         {
-            this.iframeCount = 1;
+            self.iframeCount = 1;
         }
-        this.iframes[this.iframeCount].className = "active";
+        self.iframes[self.iframeCount].className = "active";
 
-        setTimeout(this.afterSliding, 1000);
-    }.bind(this);
+        setTimeout(self.afterSliding, 1000);
+    };
 
-    this.afterSliding = function()
+    self.afterSliding = function ()
     {
-        this.inactiveIframe.className = "";
-        this.inactiveIframe.src = this.slides[this.slideCount][0];
-    }.bind(this);
+        self.inactiveIframe.className = "";
+        // self.inactiveIframe.src = self.slides[self.slideCount];
 
-    this.finishSliding = function()
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function ()
+        {
+            if (this.readyState == 4 && this.status == 200)
+            {
+                self.inactiveIframe.srcdoc = xhr.responseText;
+            }
+        }
+        xhr.open("GET", self.slides[self.slideCount], true);
+        xhr.send();
+
+    };
+
+    self.finishSliding = function ()
     {
-        var len = this.slides.length;
-        if(this.slideCount == len - 1)
+        var len = self.slides.length;
+        if (self.slideCount == len - 1)
         {
-            this.slideCount = 0;
+            self.slideCount = 0;
         }
         else
         {
-            this.slideCount++;
+            self.slideCount++;
         }
 
-        this.iframes[this.iframeCount].src = this.slides[this.slideCount][0];
-        this.iframes[this.iframeCount].className = "";
-        if(this.iframeCount == 1)
+        self.iframes[self.iframeCount].src = self.slides[self.slideCount];
+        self.iframes[self.iframeCount].className = "";
+        if (self.iframeCount == 1)
         {
-            this.iframeCount = 0;
+            self.iframeCount = 0;
         }
         else
         {
-            this.iframeCount = 1;
+            self.iframeCount = 1;
         }
-        this.iframes[this.iframeCount].className = "active";
-    }.bind(this);
+        self.iframes[self.iframeCount].className = "active";
+    };
 
 
-    this.addStyleRules = function()
+    self.addStyleRules = function ()
     {
         // used to set the style for the iframes
-        var style = "#" + this.id + " {position: absolute; overflow: hidden;}";    // style for main div
-        style += "#" + this.id + " iframe {position: absolute; border: 0; width: 100%; height: 100%; top: 0px; left: -100%;} "; // style for iframes
-        style += "#" + this.id + " iframe.active {left: 0px; transition: left " + this.animationSpeed + "s ease-out;} "; // active iframe
-        style += "#" + this.id + " iframe.afterActive {left: 100%; transition: left " + this.animationSpeed + "s ease-out;}";    // after-active iframe
+        var style = "#" + self.id + " {position: absolute; overflow: hidden;}";    // style for main div
+        style += "#" + self.id + " iframe {position: absolute; border: 0; width: 100%; height: 100%; top: 0px; left: -100%;} "; // style for iframes
+        style += "#" + self.id + " iframe.active {left: 0px; transition: left " + self.animationSpeed + "s ease-out;} "; // active iframe
+        style += "#" + self.id + " iframe.afterActive {left: 100%; transition: left " + self.animationSpeed + "s ease-out;}";    // after-active iframe
         var styleElement = document.createElement("style");
+        styleElement.id = "slidy_js_style";
         styleElement.innerHTML = style;
         document.getElementsByTagName("head")[0].appendChild(styleElement);
     };
 
-    this.start = function()
+    self.start = function ()
     {
-        this.addStyleRules();
-        this.interval = setInterval(this.slide, this.speed + this.animationSpeed);
-        this.iframes[0].src = this.slides[0][0];
-        this.iframes[1].src = this.slides[1][0];
-        this.slideCount = 1;    // reset everything
-        this.iframeCount = 0;
+        self.addStyleRules();
+        self.running = true;
+        self.interval = setInterval(self.slide, self.speed + self.animationSpeed);
+        self.iframes[0].src = self.slides[0];
+        self.iframes[1].src = self.slides[1];
+        self.slideCount = 1;    // reset everything
+        self.iframeCount = 0;
     };
 
-    this.stop = function()
+    self.stop = function ()
     {
-        clearTimeout(this.interval);
+        clearTimeout(self.interval);
+        self.running = false;
     };
 }
